@@ -28,3 +28,5 @@ if (config.node_env !== 'production') {
         )
     }))
 }
+
+export default logger

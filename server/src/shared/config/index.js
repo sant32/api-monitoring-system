@@ -1,6 +1,14 @@
 import dotenv from 'dotenv';
 
 dotenv.config();
+ 
+
+console.log("ENV CHECK:", {
+  mongo: process.env.MONGO_URI,
+  rabbit: process.env.RABBITMQ_URL,
+  pgHost: process.env.PG_HOST,
+});
+
 
 const config = {
     node_env: process.env.NODE_ENV || 'development',
@@ -8,22 +16,22 @@ const config = {
 
     //MongoDB configuration
     mongo: {
-        uri: process.env.MONGO_URI || 'mongodb://localhost:27017/api_monitoring',
-        dbName: process.env.MONGO_DB_NAME || 'api_monitoring',
+        uri: process.env.MONGO_URI,
+        dbName: process.env.MONGO_DB_NAME,
     },
 
     //Postgres configuration
     postgres: {
-        uri: process.env.POSTGRES_URI || 'localhost',
-        port: parseInt(process.env.POSTGRES_PORT || '5432', 10),
-        database: process.env.PG_DATABASE || 'api_monitoring',
-        user: process.env.PG_USER || 'postgres',
-        password: process.env.PG_PASSWORD || 223322,
+        host: process.env.PG_HOST || 'localhost',
+        port: parseInt(process.env.PG_PORT || '5432', 10),
+        database: process.env.PG_DATABASE,
+        user: process.env.PG_USER,
+        password: process.env.PG_PASSWORD,
     },
 
     //RabbitMQ configuration
     rabbitmq: {
-        uri: process.env.RABBITMQ_URI || 'amqp://localhost:5672',
+        uri: process.env.RABBITMQ_URL || 'amqp://localhost:5672',
         queue: process.env.RABBITMQ_QUEUE || 'api_hits',
         PublisherConfirms: process.env.RABBITMQ_PUBLISHER_CONFIRMS === 'true' || false,
         retryAttempts: parseInt(process.env.RABBITMQ_RETRY_ATTEMPTS || '5', 10),
@@ -36,8 +44,14 @@ const config = {
     },
 
     ratelimit: {
-        windowMs: parseInt(process.env.RATELIMIT_WINDOW_MS || '90000', 10), // 15 minute
-        maxRequests: parseInt(process.env.RATELIMIT_MAX_REQUESTS || '1000', 10), // limit each IP to 1000 requests per windowMs
+        windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '90000', 10), // 15 minute
+        maxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '1000', 10), // limit each IP to 1000 requests per windowMs
+    },
+
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        expiresIn: 224 * 60 * 60 * 1000
     }
 }
 

@@ -1,17 +1,14 @@
 import mongoose from "mongoose";
 import config from "./index.js";
-import logger from "./logger.js";
 
-
+import logger from "./logger.js"
+console.log("ENV CHECK → MONGO_URI:", process.env.MONGO_URI);
 class MongoConnection {
     constructor() {
         this.connection = null;
     }
     
-    /**
-     * Connects to MongoDB using Mongoose. If already connected, it returns the existing connection.
-     * @returns {Promise<mongoose.Connection>} The MongoDB connection instance.
-     */
+  
     async connect() {
         try {
             if (this.connection) {
@@ -19,10 +16,13 @@ class MongoConnection {
                 return this.connection;
             }
 
-            await mongoose.connect(config.mongodb_uri, {
+            await mongoose.connect(config.mongo.uri, {
                 dbName: config.mongo.dbName
             });
-            logger.info("Connected to MongoDB");
+
+            this.connection = mongoose.connection;
+
+            logger.info("Connected to MongoDB", config.MONGO_URI);
 
             this.connection.on("error", (err) => {
                 logger.error("MongoDB connection error:", err);
