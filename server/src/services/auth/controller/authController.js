@@ -59,5 +59,49 @@ export class AuthController {
         } catch (error) {
             next(error)
         }
+    };
+
+
+
+    async login(req, res, next) {
+        try {
+            const { username, password } = req.body;
+            const { token, user } = await this.authService.login(username, password)
+
+            res.cookie("authToken", token, {
+                httpOnly: config.cookie.httpOnly,
+                secure: config.cookie.secure,
+                maxAge: config.cookie.expiresIn
+            });
+
+            res.status(200).json(ResponseFormatter.success(user, "LoggedIn Successfully", 200))
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
+
+
+    async getProfile(req, res, next) {
+        try {
+            const userId = req.user.userId;
+            const result = await this.authService.getProfile(userId);
+            console.log(result)
+
+            res.status(200).json(ResponseFormatter.success(result, "Profile fetched successfully", 200))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+
+    async logout(req, res, next) {
+        try {
+            res.clearCookies("authToken")
+            res.status(200).json(ResponseFormatter.success({}, "Logout successfull"), 200)
+        } catch (error) {
+            next(error)
+        }
     }
 }

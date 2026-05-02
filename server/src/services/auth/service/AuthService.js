@@ -101,5 +101,53 @@ export class AuthService {
             logger.error("Error in register service", error)
             throw error
         }
+    };
+
+
+    async login(username, passoword) {
+        try {
+            const user = await this.userRepository.findByUsername(username);
+
+            if(!user) {
+                throw new AppError("Invalid Credentials", 401)
+            }
+
+            if(!user.isActive) {
+                throw new AppError("Account is Deactivated", 403)
+            }
+
+            const isPasswordValid = await this.comparePassword(passoword, user.password);
+
+            if(!isPasswordValid) {
+                throw new AppError("Invalid Credentails", 401)
+            }
+
+            const token = this.generateToken(user);
+
+            logger.info("User loggedIn successfully", { username: user.username })
+
+            return {
+                user: this.formatUserForResponse(user),
+                token
+            }
+        } catch (error) {
+            logger.error("Error in login service", error)
+            throw error
+        }
+    };
+
+    
+    async getProfile(userId) {
+        try {
+            const user = await this.userRepository.findById(userId);
+            if(!user) {
+                throw new AppError("User not found", 404);
+            }
+
+            return this.formatUserForResponse(user)
+        } catch (error) {
+            logger.error("Error getting user profile: ", error)
+        }
     }
+
 }
